@@ -8,3 +8,6 @@
 - effectuer deux requêtes différentes en mode batch et relier au Dashboard (streaming.ipynb) : Azim
 - graphx (graphx.ipynb) : Paul
 
+## Creer son environnement
+1. Creer un fichier .env dans le projet
+2. Ajouter `ApiKey=<clé générée sur le site>`
