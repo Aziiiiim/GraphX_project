@@ -37,13 +37,15 @@ services:
       dockerfile: Dockerfile
     container_name: jupyter
     ports: 
-    - "8888:8888"
-    - "4040:4040"
+      - "8888:8888"
+      - "4040:4040"
+    env_file:
+      - .env
     environment:
       JUPYTER_ENABLE_LAB: yes
     command: start-notebook.py --NotebookApp.token=''
     volumes:
-      - .env:/.env
+      - ./data:/data
   zookeeper1:
     image: grosinosky/zookeeper:latest
     environment:
