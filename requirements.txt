@@ -4,6 +4,7 @@ jupysql==0.10.14
 python-dotenv==1.2.1
 #seaborn==0.13.2 # ajouter en local
 grpcio==1.75.1
+python-dotenv==1.2.1
 pymongo==4.10.1
 pyspark==3.5.3
 hdfs==2.7.3
