@@ -30,6 +30,20 @@ services:
     ports:
       - '8081:8081'
 
+  notebook-graphx:
+    image: jupyter/all-spark-notebook:latest
+    container_name: jupyter-scala-graphx
+    ports:
+      - "8889:8888"
+      - "4041:4040"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - SPARK_OPTS=--packages org.apache.spark:spark-graphx_2.12:3.5.3
+    volumes:
+      - ./scala_work:/home/jovyan/work
+      - .env:/.env
+    command: start-notebook.py --NotebookApp.token=''
+
   notebook:
     image: grosinosky/bigdata_fila3_jupyter
     build:
@@ -41,6 +55,7 @@ services:
     - "4040:4040"
     environment:
       JUPYTER_ENABLE_LAB: yes
+      SPARK_OPTS: "--packages org.apache.spark:spark-graphx_2.12:3.5.3"
     command: start-notebook.py --NotebookApp.token=''
     volumes:
       - .env:/.env
