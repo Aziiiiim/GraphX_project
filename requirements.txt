@@ -2,6 +2,10 @@
 mysqlclient==2.2.4
 jupysql==0.10.14
 python-dotenv==1.2.1
+graphframes==0.6
+networkx>=3.0
+matplotlib>=3.7.0
+pandas>=2.0.0
 #seaborn==0.13.2 # ajouter en local
 grpcio==1.75.1
 python-dotenv==1.2.1

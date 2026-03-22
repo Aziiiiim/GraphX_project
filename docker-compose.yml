@@ -30,18 +30,6 @@ services:
     ports:
       - '8081:8081'
 
-  notebook-graphx:
-    image: almondsh/almond:latest
-    ports:
-      - "8889:8888"
-      - "4041:4040"
-    environment:
-      - SPARK_OPTS=--packages org.apache.spark:spark-graphx_2.12:3.5.3 --master spark://spark:7077
-    volumes:
-      - ./scala_work:/home/jovyan/work
-      - .env:/.env
-    command: ["jupyter", "notebook", "--ip=0.0.0.0", "--no-browser", "--NotebookApp.token=''"]
-
   notebook:
     image: grosinosky/bigdata_fila3_jupyter
     build:
