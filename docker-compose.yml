@@ -45,6 +45,7 @@ services:
       JUPYTER_ENABLE_LAB: yes
     command: start-notebook.py --NotebookApp.token=''
     volumes:
+      - ./utils:/home/jovyan/utils
       - ./data:/data
   zookeeper1:
     image: grosinosky/zookeeper:latest
