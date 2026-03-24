@@ -52,6 +52,8 @@ services:
     image: grosinosky/zookeeper:latest
     environment:
       ALLOW_ANONYMOUS_LOGIN: "yes"
+    volumes:
+      - zookeeper-data:/bitnami/zookeeper
   kafka1:
     image: grosinosky/kafka:3.0.2
     depends_on:
@@ -66,6 +68,8 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       ALLOW_PLAINTEXT_LISTENER: "yes"
       KAFKA_NUM_PARTITIONS: ${NUM_PARTITIONS:-2}
+    volumes:
+      - kafka-data:/bitnami/kafka
   kafka-ui:
     image: grosinosky/kafka-ui
     container_name: kafka-ui
@@ -106,4 +110,8 @@ volumes:
   garage-meta:
     external: true  
   garage-data:
+    external: true
+  kafka-data:
+    external: true
+  zookeeper-data:
     external: true
