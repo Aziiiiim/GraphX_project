@@ -49,7 +49,9 @@ services:
       - .env
     environment:
       JUPYTER_ENABLE_LAB: yes
-    command: start-notebook.py --NotebookApp.token=''
+    command: start-notebook.py --NotebookApp.token='' --ServerApp.iopub_data_rate_limit=100000000000000
+
+
     volumes:
       - ./api/utils:/home/jovyan/utils
       - ./data:/data

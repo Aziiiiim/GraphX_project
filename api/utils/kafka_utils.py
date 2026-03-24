@@ -108,11 +108,14 @@ class ConsumerManager:
 
         for _, messages in records.items():
             for message in messages:
-                message_buffer.append(message.value)
+                if isinstance(message.value, list):
+                    message_buffer.extend(message.value)
+                else:
+                    message_buffer.append(message.value)
                 print(message.value)
 
         if message_buffer:
-            return json.dumps(message_buffer).encode('utf-8')
+            return message_buffer
                 
 
     def upload_to_garage(self, topic: str, timeout_ms: int = 5000):
