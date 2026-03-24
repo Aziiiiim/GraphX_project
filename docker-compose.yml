@@ -47,6 +47,7 @@ services:
     volumes:
       - ./utils:/home/jovyan/utils
       - ./data:/data
+
   zookeeper1:
     image: grosinosky/zookeeper:latest
     environment:
