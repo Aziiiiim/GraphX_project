@@ -65,10 +65,9 @@ class Producer:
             params['start_page'] = i
             self.send_to_kafka(LINE_REPORTS_TOPICS, "line_reports/line_reports", params)
 
-    def ingest_csv(self, url:str, topic:str):
-        download = requests.get(url)
+    def ingest_csv(self, text:str, topic:str):
 
-        cr = csv.DictReader(download.text.replace('\ufeff', '').splitlines(), delimiter=';')
+        cr = csv.DictReader(text.replace('\ufeff', '').splitlines(), delimiter=';')
 
         for row in cr:
             self.producer.send(topic=topic, value=row)
@@ -121,14 +120,17 @@ class ConsumerManager:
         file_path = f"data/{topic}/batch_{now.strftime('%Y-%m-%d-%H%M%S')}.json"
         message_buffer = []
 
-        records = self.consumers[topic].poll(timeout_ms=timeout_ms, max_records=max_records)
-        total = sum(len(messages) for messages in records.values())
-        print(f"Polled {total} message(s) from {topic}")
+        while True:
+            records = self.consumers[topic].poll(timeout_ms=timeout_ms, max_records=max_records)
+            total = sum(len(messages) for messages in records.values())
+            if total == 0:
+                break
 
-        for _, messages in records.items():
-            for message in messages:
-                message_buffer.append(message.value)
-                print(message.value)
+            print(f"Polled {total} message(s) from {topic}")
+            for _, messages in records.items():
+                for message in messages:
+                    message_buffer.append(message.value)
+                    print(message.value)
 
         if message_buffer:
             try:
@@ -145,28 +147,3 @@ class ConsumerManager:
                 print(f"[ERREUR] Impossible d'écrire dans MinIO : {e}")
         else:
             print(f"[INFO] Aucun message reçu pour le topic : {topic}")
-    
-    def upload_csv_to_garage(self, topic:str, max_records: int = 5, timeout_ms: int = 5000):
-        message_buffer = []
-
-        records = self.consumers[topic].poll(timeout_ms=timeout_ms, max_records=max_records)
-        for _, messages in records.items():
-            for message in messages:
-                message_buffer.append(message.value)
-                print(message.value)
-        file_path = f"data/{topic}.csv"
-        try:
-            csv_data = io.StringIO()
-            writer = csv.DictWriter(csv_data, fieldnames=message_buffer[0].keys(), delimiter=';')
-            writer.writeheader()
-            writer.writerows(message_buffer)
-            self.minio_client.put_object(
-                self.bucket_name,
-                file_path,
-                io.BytesIO(csv_data.getvalue().encode('utf-8')),
-                length=len(csv_data.getvalue()),
-                content_type='text/csv'
-            )
-            print(f"[OK] {len(message_buffer)} messages sauvegardés dans : {file_path}")
-        except Exception as e:
-            print(f"[ERREUR] Impossible d'écrire dans MinIO : {e}")
