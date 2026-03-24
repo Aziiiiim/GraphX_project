@@ -101,9 +101,9 @@ class ConsumerManager:
         )
         print(f"Consumer created for {topic}")
 
-    def consume_from_kafka(self, topic: str, max_records: int = 5, timeout_ms: int = 5000):
+    def consume_from_kafka(self, topic: str, timeout_ms: int = 5000):
         self.add_kafka_consumer(topic)
-        records = self.consumers[topic].poll(timeout_ms=timeout_ms, max_records=max_records)
+        records = self.consumers[topic].poll(timeout_ms=timeout_ms)
         message_buffer = []
 
         for _, messages in records.items():
@@ -115,22 +115,20 @@ class ConsumerManager:
             return json.dumps(message_buffer).encode('utf-8')
                 
 
-    def upload_to_garage(self, topic: str, max_records: int = 5, timeout_ms: int = 5000):
+    def upload_to_garage(self, topic: str, timeout_ms: int = 5000):
         now = datetime.now()
         file_path = f"data/{topic}/batch_{now.strftime('%Y-%m-%d-%H%M%S')}.json"
         message_buffer = []
 
-        while True:
-            records = self.consumers[topic].poll(timeout_ms=timeout_ms, max_records=max_records)
-            total = sum(len(messages) for messages in records.values())
-            if total == 0:
-                break
+        records = self.consumers[topic].poll(timeout_ms=timeout_ms)
+        total = sum(len(messages) for messages in records.values())
 
-            print(f"Polled {total} message(s) from {topic}")
-            for _, messages in records.items():
-                for message in messages:
-                    message_buffer.append(message.value)
-                    print(message.value)
+        print(f"Polled {total} message(s) from {topic}")
+        for _, messages in records.items():
+            for message in messages:
+                message_buffer.append(message.value)
+
+        print(f"Total messages to upload: {len(message_buffer)}")
 
         if message_buffer:
             try:
