@@ -1,4 +1,4 @@
-from utils.spark_config import sql_context
+from utils.conf_spark import sql_context
 
 def request():
     test()

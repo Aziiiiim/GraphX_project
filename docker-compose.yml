@@ -6,6 +6,31 @@ services:
       - "5000:5000"
     env_file:
       - .env
+    volumes:
+      - ./api/utils:/app/utils
+      - ./api/queries:/app/queries
+    depends_on:
+      - spark
+      - spark-worker
+      - garage
+      - kafka1
+      - zookeeper1
+
+  ingestor:
+    build: 
+      context: .
+      dockerfile: ./ingestor/Dockerfile
+    container_name: ingestor
+    depends_on:
+      - api
+      - garage
+      - kafka1
+    volumes:
+      - ./ingestor:/app
+      - ./api/utils:/app/utils
+    env_file:
+      - .env
+      
 
   frontend:
     build: ./frontend

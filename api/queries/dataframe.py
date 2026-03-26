@@ -1,5 +1,4 @@
 import pandas as pd
-from pyspark.sql import SparkSession
 from utils.kafka_utils import ConsumerManager, kafka_config
 from utils.conf import sql_context
 
