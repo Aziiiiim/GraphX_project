@@ -1,6 +1,13 @@
 from pyspark import SparkContext, SparkConf, SQLContext
 from minio import Minio
-import os
+import os, json
+from kafka_utils import ConsumerManager
+
+KAFKA_CONFIG = {
+    'bootstrap_servers': 'kafka1:9092',  # Update with your Kafka broker
+    'serializer': lambda v: json.dumps(v).encode('utf-8'),  # Serialize data to JSON
+    'deserializer': lambda v: json.loads(v.decode('utf-8'))  # Deserialize data from JSON
+}
 
 client_minio = Minio(
     f'{os.getenv("minio_ip_address")}:3900',
@@ -30,3 +37,7 @@ sc._jsc.hadoopConfiguration().set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFi
 sc._jsc.hadoopConfiguration().set("fs.s3a.connection.ssl.enabled", "false")
 
 sql_context = SQLContext(sc)
+
+consumer_manager = ConsumerManager(
+    KAFKA_CONFIG
+)
