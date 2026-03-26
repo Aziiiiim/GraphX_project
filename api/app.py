@@ -21,5 +21,10 @@ def dataframe():
 def graph_request():
     return request()
 
+@app.route("/rdd")
+def get_rdd_data():
+    d = get_metro_disruptions() # USE KAFKA INSTEAD
+    return get_disruptions_per_line(d)
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
