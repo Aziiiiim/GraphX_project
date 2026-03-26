@@ -1,6 +1,7 @@
 import pandas as pd
 from pyspark.sql import SparkSession
 from utils.kafka_utils import ConsumerManager, kafka_config
+from utils.conf import sql_context
 
 consumer_manager = ConsumerManager(kafka_config)
 consumer_manager.add_kafka_consumer("line_reports")
@@ -44,30 +45,25 @@ for i in raw_data:
 # Créer le DataFrame pandas
 df = pd.DataFrame(rows)
 
-# Créer une session Spark
-spark = SparkSession.builder.appName("Classement incidents").master("local[*]").getOrCreate()
 
-# Convertir pandas DataFrame en Spark DataFrame
-spark_df = spark.createDataFrame(df)
-
-# Créer la vue SparkSQL
-spark_df.createOrReplaceTempView("incidents_table")
+# # Convertir pandas DataFrame en Spark DataFrame
+# spark_df = sql_context.createDataFrame(df)
 
 def most_stop_incident():
     # Classement par stop_name en pandas
     df_grouped = df.groupby('stop_name', as_index=False)['stop_incidents'].sum()
     df_sorted = df_grouped.sort_values(by='stop_incidents', ascending=False)
-    return(df_sorted.head(10))
+    return(df_sorted.head(10).to_dict(orient="records"))
 
 
-def most_line_incident():
-    # Classement par line avec SparkSQL
-    result = spark.sql("""
-        SELECT
-            line_name,
-            SUM(stop_incidents) AS total_incidents
-        FROM incidents_table
-        GROUP BY line_name
-        ORDER BY total_incidents DESC
-    """)
-    return(result)
+# def most_line_incident():
+#     # Classement par line avec SparkSQL
+#     result = sql_context.sql("""
+#         SELECT
+#             line_name,
+#             SUM(stop_incidents) AS total_incidents
+#         FROM incidents_table
+#         GROUP BY line_name
+#         ORDER BY total_incidents DESC
+#     """)
+#     return(result)
