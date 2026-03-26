@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>Dashboard</h1>
+    </div>
+
+    <nav class="topbar-nav">
+      <button class="nav-btn active" data-section="graphe">Graphe</button>
+      <button class="nav-btn" data-section="incidents">Incidents</button>
+    </nav>
+  </header>
+
+  <main class="main-content">
+    <section id="graphe" class="content-section active">
+      <div class="section-card">
+        <h2>Section Graphe</h2>
+        <p>
+          Cette section servira à afficher les informations liées au graphe :
+          statistiques, visualisations, résultats GraphX, etc.
+        </p>
+      </div>
+
+      <div class="section-card placeholder">
+        <h3>Contenu à venir</h3>
+        <p>Ici on pourra ajouter plus tard des cartes, tableaux ou graphes.</p>
+      </div>
+    </section>
+
+    <section id="incidents" class="content-section">
+      <div class="section-card">
+        <h2>Section Incidents</h2>
+        <p>
+          Cette section servira à afficher les incidents, filtres, résultats de requêtes,
+          agrégations ou suivi temps réel.
+        </p>
+      </div>
+
+      <div class="section-card placeholder">
+        <h3>Contenu à venir</h3>
+        <p>Ici on pourra brancher les endpoints Flask quand ils seront prêts.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+
+
+</html>
