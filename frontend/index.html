@@ -1,56 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-  <title>Dashboard</title>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
   <link rel="stylesheet" href="index.css" />
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-left">
+  <header class="header">
+    <div class="header__title">
       <h1>Dashboard</h1>
     </div>
 
-    <nav class="topbar-nav">
-      <button class="nav-btn active" data-section="graphe">Graphe</button>
-      <button class="nav-btn" data-section="incidents">Incidents</button>
+    <nav class="nav">
+      <button class="nav__button active" data-section="graph">Graphe</button>
+      <button class="nav__button" data-section="incidents">Incidents</button>
     </nav>
   </header>
 
-  <main class="main-content">
-    <section id="graphe" class="content-section active">
-      <div class="section-card">
-        <h2>Section Graphe</h2>
-        <p>
-          Cette section servira à afficher les informations liées au graphe :
-          statistiques, visualisations, résultats GraphX, etc.
-        </p>
+  <main class="layout">
+    <section id="graph" class="panel active">
+      <div class="card">
+        <h2>Graphe</h2>
       </div>
 
-      <div class="section-card placeholder">
-        <h3>Contenu à venir</h3>
-        <p>Ici on pourra ajouter plus tard des cartes, tableaux ou graphes.</p>
+      <div class="card">
+        <h3>Carte</h3>
+        <div id="graph-map" class="map"></div>
+      </div>
+
+      <div class="card">
+        <h3>Requêtes</h3>
+
+        <div class="query-form">
+          <div class="field">
+            <label for="graph-query-type">Type de requête</label>
+            <select id="graph-query-type" class="input">
+              <option value="pagerank">Pagerank</option>
+              <option value="degree">Degré entrant / sortant par station</option>
+              <option value="route">Itinéraire</option>
+            </select>
+          </div>
+
+          <div id="route-params" class="route-params hidden">
+            <div class="field">
+              <label for="route-source">Station de départ</label>
+              <input
+                type="number"
+                id="route-source"
+                class="input"
+                placeholder="Ex : 1"
+              />
+            </div>
+
+            <div class="field">
+              <label for="route-target">Station d'arrivée</label>
+              <input
+                type="number"
+                id="route-target"
+                class="input"
+                placeholder="Ex : 5"
+              />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="graph-query-button" class="button" type="button">
+              Envoyer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Résultat</h3>
+        <div id="graph-result" class="result">chat</div>
       </div>
     </section>
 
-    <section id="incidents" class="content-section">
-      <div class="section-card">
-        <h2>Section Incidents</h2>
-        <p>
-          Cette section servira à afficher les incidents, filtres, résultats de requêtes,
-          agrégations ou suivi temps réel.
-        </p>
+    <section id="incidents" class="panel">
+      <div class="card">
+        <h2>Incidents</h2>
       </div>
 
-      <div class="section-card placeholder">
-        <h3>Contenu à venir</h3>
-        <p>Ici on pourra brancher les endpoints Flask quand ils seront prêts.</p>
+      <div class="card">
+        <h3>Requêtes</h3>
+
+        <div class="query-form">
+          <div class="field">
+            <label for="incidents-mode">Mode</label>
+            <select id="incidents-mode" class="input">
+              <option value="live">Direct</option>
+              <option value="dataframe">Dataframe</option>
+              <option value="rdd">RDD</option>
+            </select>
+          </div>
+
+          <div id="incidents-history-fields" class="history-fields hidden">
+            <div class="field">
+              <label for="incidents-lookback">Remonter jusqu'à</label>
+              <select id="incidents-lookback" class="input">
+                <option value="15m">15 minutes</option>
+                <option value="1h">1 heure</option>
+                <option value="6h">6 heures</option>
+                <option value="24h">24 heures</option>
+                <option value="7d">7 jours</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="incidents-action-button" class="button" type="button">
+              Lancer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Résultat</h3>
+        <div id="incidents-result" class="result result--scroll">chat</div>
       </div>
     </section>
   </main>
 
-  <script src="app.js"></script>
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script type="module" src="/js/main.js"></script>
 </body>
-
-
 </html>
