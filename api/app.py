@@ -3,6 +3,7 @@ from queries.rdd import *
 from queries.dataframe import *
 from queries.graphx import *
 from queries.streaming import *
+from utils.conf import sql_context, client_minio
 
 app = Flask(__name__)
 
