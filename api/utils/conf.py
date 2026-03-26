@@ -3,7 +3,7 @@ from minio import Minio
 import os
 
 client_minio = Minio(
-    f"{os.getenv("minio_ip_address")}:3900",
+    f'{os.getenv("minio_ip_address")}:3900',
     access_key=os.getenv("key_id"),
     secret_key=os.getenv("secret_key"),
     secure=False,
