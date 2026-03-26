@@ -7,6 +7,19 @@ services:
     env_file:
       - .env
 
+  ingestor:
+    build: 
+      context: .
+      dockerfile: ./ingestor/Dockerfile
+    container_name: ingestor
+    depends_on:
+      - api
+    volumes:
+      - ./ingestor:/app
+      - ./api/utils:/app/utils
+    env_file:
+      - .env
+
   frontend:
     build: ./frontend
     container_name: frontend
