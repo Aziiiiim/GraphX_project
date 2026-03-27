@@ -16,11 +16,17 @@ kafka_config = {
     'deserializer': lambda v: json.loads(v.decode('utf-8'))  # Deserialize data from JSON
 }
 
-LINE_REPORTS_TOPICS  = [
-    "line_reports",
-    "links",
-    "disruptions"
-]
+LINE_REPORTS_TOPICS = {
+    "line_reports": "line_reports",
+    "links": "links",
+    "disruptions": "disruptions"
+}
+
+LINE_REPORTS_METRO_TOPICS = {
+    "line_reports": "line_reports_metro",
+    "links": "links_metro",
+    "disruptions": "disruptions_metro"
+}
 
 class Producer:
     def __init__(self, config, auth_token:str, base_url:str):
@@ -43,9 +49,9 @@ class Producer:
         response = self.get(f"{self.base_url}/{endpoint}", params)
         if response.status_code == 200:
             data = response.json()
-            for topic in topics:
-                print(f"Sending {topic} data to kafka")
-                self.producer.send(topic, data.get(topic))
+            for topic, topic_name in topics.items():
+                print(f"Sending {topic_name} data to kafka")
+                self.producer.send(topic_name, data.get(topic))
                 self.producer.flush()
             print(f"Page {data['pagination']['start_page']} of data uploaded to kafka")
             return data['pagination']['total_result']
@@ -64,6 +70,16 @@ class Producer:
         for i in range(1, int(total_result)//count+1):
             params['start_page'] = i
             self.send_to_kafka(LINE_REPORTS_TOPICS, "line_reports/line_reports", params)
+
+    def ingest_metro_line_reports(self, count=100):
+        params = {
+            "count": count
+        }
+        
+        total_result = self.send_to_kafka(LINE_REPORTS_METRO_TOPICS, "line_reports/physical_modes/physical_mode:Metro/line_reports", params)
+        for i in range(1, int(total_result)//count+1):
+            params['start_page'] = i
+            self.send_to_kafka(LINE_REPORTS_METRO_TOPICS, "line_reports/physical_modes/physical_mode:Metro/line_reports", params)
 
     def ingest_csv(self, text:str, topic:str):
 

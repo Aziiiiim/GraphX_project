@@ -1,29 +1,41 @@
-from flask import Flask
+from flask import Flask, jsonify
 from queries.rdd import *
 from queries.dataframe import *
 from queries.graphx import *
 from queries.streaming import *
 from utils.conf import client_minio, consumer_manager
+from flask import request
 
 app = Flask(__name__)
 
-@app.route("/")
-def hello_world():
-    return "<p>Hello, World!</p>"
+@app.route("/incidents/query", methods=["POST"])
+def incidents_query():
+    data = request.get_json()  # Get JSON instead of form data
+    query_type = data.get('type') if data else None
+    
+    match query_type:
+        case "rdd":
+            d = get_metro_disruptions()
+            return get_disruptions_per_line(d)
+        case "dataframe":
+            return most_stop_incident()
+        case _:
+            return {"error": "Unknown type"}, 400
 
-@app.route("/dataframe_stop_incidents")
-def dataframe():
-    res = most_stop_incident()
-    return res
+@app.route("/incidents/live")
+def incidents_live():
+    since = request.args.get('since')  # Optional timestamp parameter
+    # Return live incidents data
+    return jsonify({
+        "incidents": [],
+        "last_timestamp": None
+    })
 
-@app.route("/graph")
-def graph_request():
-    return request()
-
-@app.route("/rdd")
-def get_rdd_data():
-    d = get_metro_disruptions() # USE KAFKA INSTEAD
-    return get_disruptions_per_line(d)
+@app.route("/graph/query", methods=["POST"])
+def graph_query():
+    data = request.get_json()
+    # Process graph query data
+    return jsonify({"result": "Graph query result"})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

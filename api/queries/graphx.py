@@ -12,11 +12,12 @@ def request():
     trips_df.createOrReplaceTempView("trips")
     
     subway_routes_df = sql_context.sql(
-    """
-        SELECT DISTINCT * FROM routes r
-        WHERE agency_id = "IDFM:Operator_100"  
-            AND route_type = 1
-    """)
+        """
+            SELECT DISTINCT * FROM routes r
+            WHERE agency_id = "IDFM:Operator_100"  
+                AND route_type = 1
+        """
+    )
 
     subway_routes_df.createOrReplaceTempView("subway_routes")
         

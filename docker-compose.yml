@@ -9,6 +9,7 @@ services:
     volumes:
       - ./api/utils:/app/utils
       - ./api/queries:/app/queries
+      - ./api/app.py:/app/app.py
     depends_on:
       - spark
       - spark-worker
@@ -38,7 +39,9 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - api   
+      - api
+    volumes:
+      - ./frontend:/usr/share/nginx/html
 
   spark:
     image: grosinosky/spark:3.5.3
@@ -112,6 +115,7 @@ services:
       KAFKA_NUM_PARTITIONS: ${NUM_PARTITIONS:-2}
     volumes:
       - kafka-data:/bitnami/kafka
+    restart: always
   kafka-ui:
     image: grosinosky/kafka-ui
     container_name: kafka-ui
