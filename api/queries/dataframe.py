@@ -1,6 +1,6 @@
 import pandas as pd
 from utils.kafka_utils import ConsumerManager, kafka_config
-from utils.conf import sql_context
+from utils.conf_spark import sql_context
 
 consumer_manager = ConsumerManager(kafka_config)
 consumer_manager.add_kafka_consumer("line_reports")
