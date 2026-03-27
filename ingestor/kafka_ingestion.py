@@ -1,5 +1,5 @@
-from utils.kafka_utils import Producer
-from utils.conf import KAFKA_CONFIG, consumer_manager
+from utils.kafka_utils import Producer, kafka_config
+from utils.conf import consumer_manager
 import os
 from time import sleep
 import logging
@@ -27,7 +27,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 def main_kafka():
-    producer = Producer(KAFKA_CONFIG, PRIM_API_KEY, BASE_URL)
+    producer = Producer(kafka_config, PRIM_API_KEY, BASE_URL)
     while True:
         logger.info("Fetching new line reports from PRIM API...")
         producer.ingest_line_reports()

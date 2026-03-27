@@ -3,19 +3,10 @@ import os
 import logging
 
 from utils.kafka_utils import ConsumerManager, kafka_config
-from utils.conf import sc
+from utils.conf_spark import sc
 
 logger = logging.getLogger(__name__)
 
-def get_disruptions_kafka():
-
-    # TODO: à changer car l'URL est différente pour le cas présent: que le métro
-
-    consumer_manager = ConsumerManager(kafka_config)
-    consumer_manager.add_kafka_consumer("line_reports")
-
-    records = consumer_manager.consumers["line_reports"].poll(timeout_ms=5000, max_records=1000)
-    return records
 
 def get_metro_disruptions():
     info_trafic_metro_url = "https://prim.iledefrance-mobilites.fr/marketplace/v2/navitia/line_reports/physical_modes/physical_mode:Metro/line_reports?"

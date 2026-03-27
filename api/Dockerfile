@@ -1,8 +1,10 @@
-FROM apache/spark-py
+FROM grosinosky/spark:3.5.3
 
 WORKDIR /app
 
 USER root
+
+RUN apt-get update && apt-get install -y git
 
 # Copy the source code into the container.
 COPY . .
