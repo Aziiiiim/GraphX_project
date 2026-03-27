@@ -3,7 +3,7 @@ import os
 import logging
 
 from utils.kafka_utils import ConsumerManager, kafka_config
-from utils.conf import sc
+from utils.conf_spark import sc
 
 logger = logging.getLogger(__name__)
 
