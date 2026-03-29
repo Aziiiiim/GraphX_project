@@ -49,5 +49,5 @@ def main_kafka():
             consumer_manager.add_kafka_consumer(topic)
             consumer_manager.upload_to_garage(topic)
 
-        logger.info("Sleeping for 60 seconds...")
-        sleep(60)
+        logger.info("Sleeping for 10 seconds...")
+        sleep(10)

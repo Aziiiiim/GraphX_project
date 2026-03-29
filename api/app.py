@@ -22,14 +22,9 @@ def incidents_query():
         case _:
             return {"error": "Unknown type"}, 400
 
-@app.route("/incidents/live")
+@app.route("/incidents/live", methods=["GET"])
 def incidents_live():
-    since = request.args.get('since')  # Optional timestamp parameter
-    # Return live incidents data
-    return jsonify({
-        "incidents": [],
-        "last_timestamp": None
-    })
+    return jsonify(get_live_incidents())
 
 @app.route("/graph/query", methods=["POST"])
 def graph_query():

@@ -8,9 +8,4 @@ logging.basicConfig(
 )
 
 if __name__ == "__main__":
-    try:
-        main_garage()
-    except Exception:
-        logging.exception("Garage ingestion failed, continuing with Kafka ingestion")
-
     main_kafka()
