@@ -1,5 +1,3 @@
-import requests
-import os 
 import logging
 
 from utils.kafka_utils import ConsumerManager, kafka_config
@@ -9,77 +7,107 @@ logger = logging.getLogger(__name__)
 
 
 def get_metro_disruptions():
-    info_trafic_metro_url = "https://prim.iledefrance-mobilites.fr/marketplace/v2/navitia/line_reports/physical_modes/physical_mode:Metro/line_reports?"
-    
-    query_params = {
-        # "count": 100,
-        # "start_page": 0
-    }
+    consumer_manager = ConsumerManager(kafka_config)
 
-    response = requests.get(info_trafic_metro_url,
-                            headers={"apiKey": f"{os.getenv('PRIM_API_KEY')}"},
-                            params=query_params
+    consumer_manager.add_kafka_consumer("line_reports_metro")
+    consumer_manager.add_kafka_consumer("disruptions_metro")
+
+    line_reports_records = consumer_manager.consumers["line_reports_metro"].poll(
+        timeout_ms=5000,
+        max_records=1000
     )
-    response.raise_for_status()  # Check if the request was successful
+    disruptions_records = consumer_manager.consumers["disruptions_metro"].poll(
+        timeout_ms=5000,
+        max_records=1000
+    )
 
-    data = response.json()
-    logger.info("[RDD] Data retrieved from API")
-    return data
+    line_reports_raw = [
+        msg.value
+        for partition in line_reports_records.values()
+        for msg in partition
+    ]
+
+    disruptions_raw = [
+        msg.value
+        for partition in disruptions_records.values()
+        for msg in partition
+    ]
+
+    line_reports = []
+    for item in line_reports_raw:
+        if isinstance(item, list):
+            line_reports.extend(item)
+        else:
+            line_reports.append(item)
+
+    disruptions = []
+    for item in disruptions_raw:
+        if isinstance(item, list):
+            disruptions.extend(item)
+        else:
+            disruptions.append(item)
+
+    logger.info(f"[RDD] {len(line_reports)} line reports read from Kafka")
+    logger.info(f"[RDD] {len(disruptions)} disruptions read from Kafka")
+
+    return {
+        "line_reports": line_reports,
+        "disruptions": disruptions
+    }
 
 
 def get_disruptions_per_line(data):
-    # Get RDDs
-    line_reports = sc.parallelize(data["line_reports"])
-    disruptions = sc.parallelize(data["disruptions"])
+    line_reports_data = data.get("line_reports", [])
+    disruptions_data = data.get("disruptions", [])
 
-    # RDD Key -> Value for disruptions
-    disruptions_by_id = disruptions.map(lambda d: (d["id"], d)) # id and not disruption_id
-    # print("Disruptions by id : ", disruptions_by_id.take(5))
+    if not line_reports_data or not disruptions_data:
+        return {"error": "No data from Kafka"}
+
+    line_reports = sc.parallelize(line_reports_data)
+    disruptions = sc.parallelize(disruptions_data)
+
+    disruptions_by_id = disruptions.map(lambda d: (d["id"], d))
     logger.info("[RDD] Disruptions RDD created with id as key")
 
-    # RDD Key -> Value for line reports (same key as disruption links)
     def extract_disruption(report):
         results = []
 
         for obj in report.get("pt_objects", []):
-            details = obj.get(obj["embedded_type"], {})
+            embedded_type = obj.get("embedded_type")
+            details = obj.get(embedded_type, {}) if embedded_type else {}
 
             for link in details.get("links", []):
-                if link["type"] == "disruption":
+                if link.get("type") == "disruption":
                     results.append((link["id"], report["line"]["id"]))
 
         return results
 
-    links = line_reports.flatMap(extract_disruption)
-    links = links.distinct() # remove duplicates (stop + line can be linked to the same disruption, for instance)
-    # print("Links : ", links.take(5))
+    links = line_reports.flatMap(extract_disruption).distinct()
     logger.info("[RDD] Links RDD created")
 
-    # Join disruptions with line reports (thanks to the same key : disruption id)
     joined = links.join(disruptions_by_id)
-    # print("Joined : ", joined.take(5))
     logger.info("[RDD] Joined RDD created")
-
 
     def get_title_message(msg_list):
         for msg in msg_list:
-            if msg["channel"]["name"] == "titre":
-                return msg["text"]
-        return msg_list[0]["text"] if msg_list else "No message available"
+            channel = msg.get("channel", {})
+            if channel.get("name") == "titre":
+                return msg.get("text", "No message available")
+        return msg_list[0].get("text", "No message available") if msg_list else "No message available"
 
-    # Extract disruption message
     traffic = joined.map(
         lambda x: (
-            x[1][0],  # line id
-            get_title_message(x[1][1]["messages"]) # We could retrieve a more detailed message by getting the one for channel "moteur" or other
+            x[1][0],
+            get_title_message(x[1][1].get("messages", []))
         )
     )
-    traffic_by_line = traffic.groupByKey().mapValues(list)
-    # print("Traffic by line : ", traffic_by_line.take(5))
-    logger.info("[RDD] Traffic by line RDD created")
 
-    return traffic_by_line.collect()
+    result = traffic.groupByKey().mapValues(list).collect()
 
-    ### NEXT STEPS ###
-    # Make sure 'application_periods' attribute matches the current time
-    # Get impacted stations information
+    return [
+        {
+            "line_id": line_id,
+            "messages": messages
+        }
+        for line_id, messages in result
+    ]

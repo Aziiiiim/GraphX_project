@@ -50,8 +50,14 @@ class Producer:
         if response.status_code == 200:
             data = response.json()
             for topic, topic_name in topics.items():
-                print(f"Sending {topic_name} data to kafka")
-                self.producer.send(topic_name, data.get(topic))
+                payload = data.get(topic)
+                size = len(payload) if isinstance(payload, list) else 0
+                print(f"[PRODUCER] Sending to topic={topic_name} key={topic} items={size}")
+                if size > 0:
+                    print(f"[PRODUCER] Sample for {topic_name}: {payload[0]}")
+                else:
+                    print(f"[PRODUCER] No payload for key={topic}")
+                self.producer.send(topic_name, payload)
                 self.producer.flush()
             print(f"Page {data['pagination']['start_page']} of data uploaded to kafka")
             return data['pagination']['total_result']

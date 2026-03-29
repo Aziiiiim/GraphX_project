@@ -28,14 +28,26 @@ logger.addHandler(handler)
 
 def main_kafka():
     producer = Producer(kafka_config, PRIM_API_KEY, BASE_URL)
+
     while True:
-        logger.info("Fetching new line reports from PRIM API...")
+        logger.info("Fetching ALL line reports...")
         producer.ingest_line_reports()
 
-        logger.info("Saving line reports to Kafka topics...")
-        for topic in LINE_REPORTS_TOPICS:
+        logger.info("Fetching METRO line reports...")
+        producer.ingest_metro_line_reports()
+
+        logger.info("Saving line reports to Garage...")
+
+        for topic in [
+            "line_reports",
+            "links",
+            "disruptions",
+            "line_reports_metro",
+            "links_metro",
+            "disruptions_metro"
+        ]:
             consumer_manager.add_kafka_consumer(topic)
             consumer_manager.upload_to_garage(topic)
 
-        logger.info("Sleeping for 60 seconds before the next fetch...")
+        logger.info("Sleeping for 60 seconds...")
         sleep(60)

@@ -238,3 +238,112 @@ body {
 .result-item:last-child {
   border-bottom: none;
 }
+
+.df-result {
+  display: grid;
+  gap: 14px;
+}
+
+.df-result__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.df-result__subtitle {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+.df-table-wrapper {
+  overflow-x: auto;
+}
+
+.df-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.df-table th,
+.df-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.df-table th {
+  background: var(--surface-alt);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.df-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.df-table tbody tr:hover {
+  background: #f8fbff;
+}
+
+.df-rank {
+  font-weight: 700;
+  color: var(--primary);
+  width: 80px;
+}
+
+.incident-badge {
+  display: inline-block;
+  min-width: 42px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 700;
+  text-align: center;
+}
+
+.rdd-result {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rdd-result__title {
+  margin: 0;
+}
+
+.rdd-result__subtitle {
+  margin: 0;
+  opacity: 0.8;
+}
+
+.rdd-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rdd-card {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.rdd-line {
+  margin: 0 0 8px 0;
+}
+
+.rdd-messages {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.rdd-message {
+  margin-bottom: 6px;
+}
